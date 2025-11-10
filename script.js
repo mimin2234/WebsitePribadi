@@ -114,10 +114,11 @@ function showNotification(message, type = "info") {
     `;
 
   // Add styles
+  const isMobile = window.innerWidth <= 768;
   notification.style.cssText = `
         position: fixed;
-        top: 20px;
-        right: 20px;
+        top: ${isMobile ? "10px" : "20px"};
+        ${isMobile ? "left: 10px; right: 10px;" : "right: 20px;"}
         background: ${
           type === "success"
             ? "#4CAF50"
@@ -126,12 +127,12 @@ function showNotification(message, type = "info") {
             : "#2196F3"
         };
         color: white;
-        padding: 1rem 1.5rem;
+        padding: ${isMobile ? "0.875rem 1rem" : "1rem 1.5rem"};
         border-radius: 10px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         z-index: 10000;
-        max-width: 400px;
-        animation: slideInRight 0.3s ease-out;
+        max-width: ${isMobile ? "100%" : "400px"};
+        animation: ${isMobile ? "slideInDown" : "slideInRight"} 0.3s ease-out;
     `;
 
   // Add to document
@@ -140,7 +141,8 @@ function showNotification(message, type = "info") {
   // Auto remove after 5 seconds
   setTimeout(() => {
     if (notification.parentNode) {
-      notification.style.animation = "slideOutRight 0.3s ease-in";
+      const animation = isMobile ? "slideOutUp" : "slideOutRight";
+      notification.style.animation = `${animation} 0.3s ease-in`;
       setTimeout(() => notification.remove(), 300);
     }
   }, 5000);
@@ -148,7 +150,8 @@ function showNotification(message, type = "info") {
   // Close button functionality
   const closeBtn = notification.querySelector(".notification-close");
   closeBtn.addEventListener("click", () => {
-    notification.style.animation = "slideOutRight 0.3s ease-in";
+    const animation = isMobile ? "slideOutUp" : "slideOutRight";
+    notification.style.animation = `${animation} 0.3s ease-in`;
     setTimeout(() => notification.remove(), 300);
   });
 }
@@ -167,6 +170,17 @@ style.textContent = `
         }
     }
     
+    @keyframes slideInDown {
+        from {
+            transform: translateY(-100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+    
     @keyframes slideOutRight {
         from {
             transform: translateX(0);
@@ -174,6 +188,17 @@ style.textContent = `
         }
         to {
             transform: translateX(100%);
+            opacity: 0;
+        }
+    }
+    
+    @keyframes slideOutUp {
+        from {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateY(-100%);
             opacity: 0;
         }
     }
@@ -193,6 +218,17 @@ style.textContent = `
         cursor: pointer;
         padding: 0;
         line-height: 1;
+        touch-action: manipulation;
+    }
+    
+    @media (max-width: 768px) {
+        .notification {
+            font-size: 0.9rem;
+        }
+        
+        .notification-close {
+            font-size: 1.25rem;
+        }
     }
 `;
 document.head.appendChild(style);
